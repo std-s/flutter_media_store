@@ -1,5 +1,5 @@
 name: flutter_media_store
-description: "A new Flutter plugin project."
+description: "A Flutter plugin to save and manage files in Android MediaStore seamlessly."
 version: 1.0.0
 homepage: https://github.com/Rajkumarlohar65/flutter_media_store.git
 
