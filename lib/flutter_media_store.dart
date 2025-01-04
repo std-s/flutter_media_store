@@ -41,6 +41,43 @@ class FlutterMediaStore {
     }
   }
 
+  /// Append data to an existing file in the MediaStore
+  Future<void> appendDataToMediaStore({
+    required String uri,
+    required List<int> fileData,
+    required Function(String result) onSuccess, // Callback for success with result
+    required Function(String errorMessage) onError, // Callback for error with message
+  }) async {
+
+    if (!await _checkAndRequestPermissions()) {
+      onError('Permission denied. Cannot append data.');
+      return;
+    }
+
+    try {
+      final result = await FlutterMediaStorePlatformInterface.instance.appendDataToMediaStore(
+        uri: uri,
+        fileData: fileData,
+        onSuccess: (String result) {
+          print(result);
+        },
+        onError: (String errorMessage) {
+          print(errorMessage);
+        },
+      );
+
+      if (result.startsWith("IOException") || result.startsWith("Failed")) {
+        // Failure, invoke onError with the error message
+        onError(result);
+      } else {
+        // Success, invoke onSuccess with result
+        onSuccess(result);
+      }
+    } catch (e) {
+      onError('Error: ${e.toString()}');
+    }
+  }
+
   /// Check and request necessary permissions
   Future<bool> _checkAndRequestPermissions() async {
     // Check for storage permissions (e.g., WRITE_EXTERNAL_STORAGE on Android)

@@ -47,6 +47,20 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
           result.error("ARGUMENT_ERROR", "Invalid arguments", null)
         }
       }
+
+      "appendDataToMediaStore" -> {
+        val uriString = call.argument<String>("uri")
+        val fileData = call.argument<ByteArray>("fileData")
+
+        if (uriString != null && fileData != null) {
+          val uri = Uri.parse(uriString)
+          val appendResult = appendDataToFile(applicationContext?.contentResolver, uri, fileData)
+          result.success(appendResult)
+        } else {
+          result.error("ARGUMENT_ERROR", "Invalid arguments", null)
+        }
+      }
+
       else -> result.notImplemented()
     }
   }
@@ -103,7 +117,8 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
         }
 
         // Get the real file path from the content URI
-        val filePath = getFilePathFromUri(uri)
+//        val filePath = getFilePathFromUri(uri)
+        val filePath = uri.toString()
         filePath ?: "File saved but path could not be retrieved"
       } catch (e: IOException) {
         "IOException: ${e.localizedMessage}" // return error message
@@ -132,6 +147,22 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
       file.absolutePath // return the file path on success
     } catch (e: IOException) {
       "IOException: ${e.localizedMessage}" // return error message
+    }
+  }
+
+  // Function to append data to an existing file in MediaStore
+  private fun appendDataToFile(
+    resolver: ContentResolver?,
+    uri: Uri,
+    dataToAppend: ByteArray
+  ): String {
+    return try {
+      resolver?.openOutputStream(uri, "wa")?.use { outputStream ->
+        outputStream.write(dataToAppend)
+        "Data appended successfully"
+      } ?: "Failed to open output stream"
+    } catch (e: IOException) {
+      "IOException: ${e.localizedMessage}"
     }
   }
 

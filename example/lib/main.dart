@@ -53,6 +53,18 @@ class _MyAppState extends State<MyApp> {
         onSuccess: (String filePath) {
           // Callbacks on success
           _updateMessage('✅ File saved successfully: $filePath');
+
+          _flutterMediaStorePlugin.appendDataToMediaStore(
+            uri: filePath, // Replace with actual URI
+            fileData: fileData,
+            onSuccess: (result) {
+              print("Data appended successfully: $result");
+            },
+            onError: (errorMessage) {
+              print("Error appending data: $errorMessage");
+            },
+          );
+
         },
         onError: (String errorMessage) {
           // Callbacks on error

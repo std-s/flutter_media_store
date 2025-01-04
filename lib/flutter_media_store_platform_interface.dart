@@ -25,4 +25,13 @@ abstract class FlutterMediaStorePlatformInterface extends PlatformInterface {
     required Function(String filePath) onSuccess, // Callback for success
     required Function(String errorMessage) onError, // Callback for error
   });
+
+  /// Append data to an existing file in the MediaStore
+  Future<String> appendDataToMediaStore({
+    required String uri,
+    required List<int> fileData,
+    required Function(String result) onSuccess, // Callback for success with result
+    required Function(String errorMessage) onError, // Callback for error with message
+  });
+
 }
