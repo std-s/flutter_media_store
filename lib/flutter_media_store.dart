@@ -3,7 +3,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class FlutterMediaStore {
   /// Save a file to the MediaStore with success and error handling.
-  Future<void> saveFileToMediaStore({
+  Future<void> saveFile({
     required List<int> fileData,
     required String mimeType,
     required String rootFolderName,
@@ -42,7 +42,7 @@ class FlutterMediaStore {
   }
 
   /// Append data to an existing file in the MediaStore
-  Future<void> appendDataToMediaStore({
+  Future<void> appendDataToFile({
     required String uri,
     required List<int> fileData,
     required Function(String result) onSuccess, // Callback for success with result

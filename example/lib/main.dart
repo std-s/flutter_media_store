@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_media_store/flutter_media_store.dart';
@@ -16,9 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _flutterMediaStorePlugin = FlutterMediaStore();
   String _message = 'Press the button to save a file';
-
   String rootFolderName = 'FlutterMediaStore';
 
 
@@ -37,6 +33,7 @@ class _MyAppState extends State<MyApp> {
     required String rootFolderName,
     required String folderName,
   }) async {
+    final flutterMediaStorePlugin = FlutterMediaStore();
 
     try {
       // Load file from assets using rootBundle
@@ -44,24 +41,25 @@ class _MyAppState extends State<MyApp> {
       Uint8List fileData = byteData.buffer.asUint8List();
 
       // Save the file using the plugin and handle success/error via callbacks
-      await _flutterMediaStorePlugin.saveFileToMediaStore(
+      await flutterMediaStorePlugin.saveFile(
         fileData: fileData,
         mimeType: mimeType,
         rootFolderName: rootFolderName,
         folderName: folderName,
         fileName: fileName,
-        onSuccess: (String filePath) {
+        onSuccess: (String uri) {
           // Callbacks on success
-          _updateMessage('✅ File saved successfully: $filePath');
+          _updateMessage('✅ File saved successfully: $uri');
 
-          _flutterMediaStorePlugin.appendDataToMediaStore(
-            uri: filePath, // Replace with actual URI
-            fileData: fileData,
+          // Appends data to an existing file in the MediaStore using the given URI.
+          flutterMediaStorePlugin.appendDataToFile(
+            uri: uri,
+            fileData: fileData, // append new data
             onSuccess: (result) {
-              print("Data appended successfully: $result");
+              print(result);
             },
             onError: (errorMessage) {
-              print("Error appending data: $errorMessage");
+              print(errorMessage);
             },
           );
 
