@@ -17,7 +17,6 @@ class _MyAppState extends State<MyApp> {
   String _message = 'Press the button to save a file';
   String rootFolderName = 'FlutterMediaStore';
 
-
   /// Update the message state
   void _updateMessage(String newMessage) {
     setState(() {
@@ -65,7 +64,6 @@ class _MyAppState extends State<MyApp> {
               print(errorMessage);
             },
           );
-
         },
         onError: (String errorMessage) {
           // Callbacks on error
@@ -162,8 +160,7 @@ class _MyAppState extends State<MyApp> {
                           mimeType: 'application/xml',
                           fileName: 'sample.xml',
                           folderName: 'Xml',
-                          rootFolderName: rootFolderName
-                      ),
+                          rootFolderName: rootFolderName),
                       child: const Text('Save XML File'),
                     ),
                     ElevatedButton(
@@ -172,8 +169,7 @@ class _MyAppState extends State<MyApp> {
                           mimeType: 'audio/mpeg',
                           fileName: 'sample.mp3',
                           folderName: 'Music',
-                          rootFolderName: rootFolderName
-                      ),
+                          rootFolderName: rootFolderName),
                       child: const Text('Save MP3 File'),
                     ),
                     ElevatedButton(
@@ -182,8 +178,7 @@ class _MyAppState extends State<MyApp> {
                           mimeType: 'video/mp4',
                           fileName: 'sample.mp4',
                           folderName: 'Videos',
-                          rootFolderName: rootFolderName
-                      ),
+                          rootFolderName: rootFolderName),
                       child: const Text('Save MP4 File'),
                     ),
                     ElevatedButton(
@@ -225,5 +220,4 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
 }

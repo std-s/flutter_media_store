@@ -20,7 +20,8 @@ class FlutterMediaStore {
     }
 
     try {
-      final result = await FlutterMediaStorePlatformInterface.instance.saveFileToMediaStore(
+      final result = await FlutterMediaStorePlatformInterface.instance
+          .saveFileToMediaStore(
         fileData: fileData,
         fileName: fileName,
         mimeType: mimeType,
@@ -58,7 +59,8 @@ class FlutterMediaStore {
     }
 
     try {
-      final result = await FlutterMediaStorePlatformInterface.instance.appendDataToMediaStore(
+      final result = await FlutterMediaStorePlatformInterface.instance
+          .appendDataToMediaStore(
         uri: uri,
         fileData: fileData,
         onSuccess: (String result) => onSuccess(result),

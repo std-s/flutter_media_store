@@ -13,7 +13,8 @@ class FlutterMediaStoreMethodChannel
     required String rootFolderName, // Accept rootFolderName as input
     required String folderName,
     required String fileName, // Make fileName optional
-    required Function(String uri, String filePath) onSuccess, // Update to accept both URI and filePath
+    required Function(String uri, String filePath)
+        onSuccess, // Update to accept both URI and filePath
     required Function(String errorMessage) onError, // Callback for error
   }) async {
     final result = await _channel.invokeMethod<String>(
@@ -38,7 +39,8 @@ class FlutterMediaStoreMethodChannel
     required Function(String errorMessage)
         onError, // Callback for error with message
   }) async {
-    final result = await _channel.invokeMethod<String>('appendDataToMediaStore', {
+    final result =
+        await _channel.invokeMethod<String>('appendDataToMediaStore', {
       'uri': uri,
       'fileData': fileData,
     });
