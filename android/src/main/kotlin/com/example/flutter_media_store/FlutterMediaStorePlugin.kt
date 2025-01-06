@@ -90,6 +90,7 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
   }
 
+  // Save file using MediaStore API for Android 10 and above
   private fun saveFileUsingMediaStore(
     resolver: ContentResolver?,
     fileData: ByteArray,
@@ -122,6 +123,7 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
   }
 
+  // Extract the file path from the URI
   private fun getFilePathFromUri(uri: Uri): String? {
     val cursor = applicationContext?.contentResolver?.query(uri, null, null, null, null)
     cursor?.use {
@@ -152,6 +154,7 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
   }
 
+  // Save file directly for Android versions below Android 10
   private fun saveFileDirectly(
     fileData: ByteArray,
     fileName: String,
