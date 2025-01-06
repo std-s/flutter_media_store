@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
         fileName: fileName,
         onSuccess: (String uri, String filePath) {
           // Callbacks on success
-          _updateMessage('✅ File saved successfully: $filePath.toString()');
+          _updateMessage('✅ File saved successfully: $filePath');
 
           print('uri: ${uri.toString()}');
           print('path: ${filePath.toString()}');
