@@ -1,3 +1,9 @@
+## 1.2.1
+
+* **Removed** dependency on device_info_plus and replaced it with a native method to retrieve the Android SDK version.
+* **Improved** SDK version check to dynamically handle permissions based on the actual Android version without the need for additional packages.
+* **Enhanced** permission flow to work seamlessly with Android 10+ versions.
+
 ## 1.2.0
 
 * **Added** support for `MANAGE_EXTERNAL_STORAGE` permission for Android 11+.

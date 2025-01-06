@@ -51,7 +51,7 @@ To get started with the **Flutter Media Store Plugin**, follow these steps:
     dependencies:
       flutter:
         sdk: flutter
-      flutter_media_store: ^1.2.0
+      flutter_media_store: ^1.2.1
     ```
 
 2. **Run** `flutter pub get` to fetch the plugin and its dependencies.
