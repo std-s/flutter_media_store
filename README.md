@@ -5,6 +5,9 @@ Welcome to the **Flutter Media Store Plugin**! This plugin allows you to save va
 ## Features
 
 - **Save files to MediaStore**: Easily save files such as images, audio, video, CSV, text, and more.
+
+- **Append data to existing files**: Allows appending data to files already saved in MediaStore (e.g., adding additional content to existing files).
+
 - **Android-specific**: This plugin currently supports Android devices.
 - **Automatic Permission Handling**: The plugin checks and requests storage permissions to ensure proper functionality.
 - **Cross-file type support**: Save different file types like PNG, JPG, PDF, CSV, TXT, XML, Json, MP3, MP4, ZIP, Tar etc.
@@ -25,7 +28,7 @@ To get started with the **Flutter Media Store Plugin**, follow these steps:
     dependencies:
       flutter:
         sdk: flutter
-      flutter_media_store: ^1.0.0
+      flutter_media_store: ^1.1.0
     ```
 
 2. **Run** `flutter pub get` to fetch the plugin and its dependencies.
@@ -51,39 +54,56 @@ The main method to save a file is `saveFile`. Here's an example of how to use it
 
 ```dart
 Future<void> saveFile({
-    required String assetPath,
-    required String mimeType,
-    required String fileName,
-    required String rootFolderName,
-    required String folderName,
-  }) async {
+   required String assetPath,
+   required String mimeType,
+   required String fileName,
+   required String rootFolderName,
+   required String folderName,
+}) async {
+   final flutterMediaStorePlugin = FlutterMediaStore();
 
-    try {
+   try {
       // Load file from assets using rootBundle
       ByteData byteData = await rootBundle.load(assetPath);
       Uint8List fileData = byteData.buffer.asUint8List();
 
       // Save the file using the plugin and handle success/error via callbacks
-      await _flutterMediaStorePlugin.saveFileToMediaStore(
-        fileData: fileData,
-        mimeType: mimeType,
-        rootFolderName: rootFolderName,
-        folderName: folderName,
-        fileName: fileName,
-        onSuccess: (String filePath) {
-          // Callbacks on success
-          print('✅ File saved successfully: $filePath');
-        },
-        onError: (String errorMessage) {
-          // Callbacks on error
-          print('❌ Failed to save file: $errorMessage');
-        },
+      await flutterMediaStorePlugin.saveFile(
+         fileData: fileData,
+         mimeType: mimeType,
+         rootFolderName: rootFolderName,
+         folderName: folderName,
+         fileName: fileName,
+         onSuccess: (String uri, String filePath) {
+            // Callbacks on success
+            _updateMessage('✅ File saved successfully: $filePath.toString()');
+
+            print('uri: ${uri.toString()}');
+            print('path: ${filePath.toString()}');
+
+            // Appends data to an existing file in the MediaStore using the given URI.
+            flutterMediaStorePlugin.appendDataToFile(
+               uri: uri,
+               fileData: fileData, // append new data
+               onSuccess: (result) {
+                  print(result);
+               },
+               onError: (errorMessage) {
+                  print(errorMessage);
+               },
+            );
+
+         },
+         onError: (String errorMessage) {
+            // Callbacks on error
+            _updateMessage('❌ Failed to save file: $errorMessage');
+         },
       );
-    } catch (e) {
+   } catch (e) {
       // Catch and log any errors that may occur during the process
-      print('❌ Error loading file from assets: ${e.toString()}');
-    }
-  }
+      _updateMessage('❌ Error loading file from assets: ${e.toString()}');
+   }
+}
 ```
 
 ## MIME Type List
@@ -91,16 +111,16 @@ Below is a list of supported MIME types for different file types:
 
 ```xml
    PNG Image: image/png
-   JPG Image: image/jpeg
-   PDF File: application/pdf
-   CSV File: text/csv
-   TXT File: text/plain
-   XML File: application/xml
-   JSON File: application/json
-   MP3 File: audio/mpeg
-   MP4 Video: video/mp4
-   ZIP Archive: application/zip
-   TAR Archive: application/x-tar
+        JPG Image: image/jpeg
+        PDF File: application/pdf
+        CSV File: text/csv
+        TXT File: text/plain
+        XML File: application/xml
+        JSON File: application/json
+        MP3 File: audio/mpeg
+        MP4 Video: video/mp4
+        ZIP Archive: application/zip
+        TAR Archive: application/x-tar
 ```
 
 Use the appropriate MIME type for the file format you are saving.
@@ -111,14 +131,14 @@ Use the appropriate MIME type for the file format you are saving.
 
 ```dart
 ElevatedButton(
-   onPressed: () => saveFile(
-                        assetPath: 'assets/csv/sample.csv',
-                        mimeType: 'text/csv',
-                        fileName: 'sample.csv',
-                        folderName: 'Csv',
-                        rootFolderName: rootFolderName,
-                     ),
-   child: const Text('Save CSV File'),
+onPressed: () => saveFile(
+assetPath: 'assets/csv/sample.csv',
+mimeType: 'text/csv',
+fileName: 'sample.csv',
+folderName: 'Csv',
+rootFolderName: rootFolderName,
+),
+child: const Text('Save CSV File'),
 ),
 ```
 
@@ -127,7 +147,9 @@ ElevatedButton(
 This project is licensed under the BSD License - see the [LICENSE](LICENSE) file for details.
 
 
-## Contact
+## Developer
+
+**Rajkumar Lohar**
 
 For any questions or support, please reach out to:
 
