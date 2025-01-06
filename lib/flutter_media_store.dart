@@ -9,10 +9,9 @@ class FlutterMediaStore {
     required String rootFolderName,
     required String folderName,
     required String fileName,
-    required Function(String result) onSuccess, // Callback for success with file path
-    required Function(String errorMessage) onError, // Callback for error with message
+    required Function(String uri, String filePath) onSuccess, // Update to accept both URI and filePath
+    required Function(String errorMessage) onError,
   }) async {
-
     if (!await _checkAndRequestPermissions()) {
       onError('Permission denied. Cannot save file.');
       return;
@@ -26,20 +25,25 @@ class FlutterMediaStore {
         rootFolderName: rootFolderName,
         folderName: folderName,
         onSuccess: onSuccess,
-        onError: onError,
+        onError: onError
       );
 
       if (result.startsWith("IOException") || result.startsWith("Failed")) {
-        // Failure, invoke onError with the error message
         onError(result);
       } else {
-        // Success, invoke onSuccess with file path
-        onSuccess(result);
+        // Split the result to extract URI and filePath
+        final parts = result.split('|');
+        if (parts.length == 2) {
+          onSuccess(parts[1], parts[0]); // URI and filePath
+        } else {
+          onError("Unexpected result format: $result");
+        }
       }
     } catch (e) {
       onError('Error: ${e.toString()}');
     }
   }
+
 
   /// Append data to an existing file in the MediaStore
   Future<void> appendDataToFile({

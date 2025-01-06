@@ -90,7 +90,6 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
   }
 
-  // Method to save the file using MediaStore API (for Android 10 and above)
   private fun saveFileUsingMediaStore(
     resolver: ContentResolver?,
     fileData: ByteArray,
@@ -108,21 +107,33 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
 
     return if (uri != null) {
       try {
-        // Write the data to the file
         resolver.openOutputStream(uri)?.use {
           it.write(fileData)
         }
 
-        // Get the real file path from the content URI
-        val filePath = uri.toString()
-        filePath ?: "File saved but path could not be retrieved"
+        val filePath = getFilePathFromUri(uri)
+        val fileUri = uri.toString()
+        "$filePath|$fileUri" // Combine filePath and URI
       } catch (e: IOException) {
-        "IOException: ${e.localizedMessage}" // Return error message
+        "IOException: ${e.localizedMessage}"
       }
     } else {
-      "Failed to create URI" // Return error message
+      "Failed to create URI"
     }
   }
+
+  private fun getFilePathFromUri(uri: Uri): String? {
+    val cursor = applicationContext?.contentResolver?.query(uri, null, null, null, null)
+    cursor?.use {
+      val columnIndex = it.getColumnIndex(MediaStore.MediaColumns.DATA)
+      if (it.moveToFirst()) {
+
+        return it.getString(columnIndex)
+      }
+    }
+    return null
+  }
+
 
   // Method to append data to an existing file in MediaStore
   private fun appendDataToFile(
@@ -141,7 +152,6 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
   }
 
-  // Method to save the file directly (for Android versions below Android 10)
   private fun saveFileDirectly(
     fileData: ByteArray,
     fileName: String,
@@ -150,20 +160,20 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     val fileDir = File(applicationContext?.getExternalFilesDir(null), relativePath)
 
     if (!fileDir.exists()) {
-      fileDir.mkdirs() // Create directories if they do not exist
+      fileDir.mkdirs()
     }
 
     val file = File(fileDir, fileName)
     return try {
-      // Write the data to the file
       val outputStream = FileOutputStream(file)
       outputStream.write(fileData)
       outputStream.close()
-      file.absolutePath // Return the file path on success
+      "${file.absolutePath}|file://${file.absolutePath}" // Combine filePath and URI
     } catch (e: IOException) {
-      "IOException: ${e.localizedMessage}" // Return error message
+      "IOException: ${e.localizedMessage}"
     }
   }
+
 
   // Method to append data to the file directly (for Android versions below Android 10)
   private fun appendDataDirectly(

@@ -47,9 +47,12 @@ class _MyAppState extends State<MyApp> {
         rootFolderName: rootFolderName,
         folderName: folderName,
         fileName: fileName,
-        onSuccess: (String uri) {
+        onSuccess: (String uri, String filePath) {
           // Callbacks on success
-          _updateMessage('✅ File saved successfully: $uri');
+          _updateMessage('✅ File saved successfully: $filePath.toString()');
+
+          print('uri: ${uri.toString()}');
+          print('path: ${filePath.toString()}');
 
           // Appends data to an existing file in the MediaStore using the given URI.
           flutterMediaStorePlugin.appendDataToFile(
