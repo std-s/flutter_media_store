@@ -1,5 +1,7 @@
 import 'package:flutter_media_store/flutter_media_store_platform_interface.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart'; // For Platform checks
 
 class FlutterMediaStore {
   /// Save a file to the MediaStore with success and error handling.
@@ -9,7 +11,7 @@ class FlutterMediaStore {
     required String rootFolderName,
     required String folderName,
     required String fileName,
-    required Function(String uri, String filePath) onSuccess, // Update to accept both URI and filePath
+    required Function(String uri, String filePath) onSuccess,
     required Function(String errorMessage) onError,
   }) async {
     if (!await _checkAndRequestPermissions()) {
@@ -18,23 +20,23 @@ class FlutterMediaStore {
     }
 
     try {
-      final result = await FlutterMediaStorePlatformInterface.instance.saveFileToMediaStore(
+      final result = await FlutterMediaStorePlatformInterface.instance
+          .saveFileToMediaStore(
         fileData: fileData,
         fileName: fileName,
         mimeType: mimeType,
         rootFolderName: rootFolderName,
         folderName: folderName,
         onSuccess: onSuccess,
-        onError: onError
+        onError: onError,
       );
 
       if (result.startsWith("IOException") || result.startsWith("Failed")) {
         onError(result);
       } else {
-        // Split the result to extract URI and filePath
         final parts = result.split('|');
         if (parts.length == 2) {
-          onSuccess(parts[1], parts[0]); // URI and filePath
+          onSuccess(parts[1], parts[0]);
         } else {
           onError("Unexpected result format: $result");
         }
@@ -44,37 +46,30 @@ class FlutterMediaStore {
     }
   }
 
-
   /// Append data to an existing file in the MediaStore
   Future<void> appendDataToFile({
     required String uri,
     required List<int> fileData,
-    required Function(String result) onSuccess, // Callback for success with result
-    required Function(String errorMessage) onError, // Callback for error with message
+    required Function(String result) onSuccess,
+    required Function(String errorMessage) onError,
   }) async {
-
     if (!await _checkAndRequestPermissions()) {
       onError('Permission denied. Cannot append data.');
       return;
     }
 
     try {
-      final result = await FlutterMediaStorePlatformInterface.instance.appendDataToMediaStore(
+      final result = await FlutterMediaStorePlatformInterface.instance
+          .appendDataToMediaStore(
         uri: uri,
         fileData: fileData,
-        onSuccess: (String result) {
-          print(result);
-        },
-        onError: (String errorMessage) {
-          print(errorMessage);
-        },
+        onSuccess: (String result) => onSuccess(result),
+        onError: (String errorMessage) => onError(errorMessage),
       );
 
       if (result.startsWith("IOException") || result.startsWith("Failed")) {
-        // Failure, invoke onError with the error message
         onError(result);
       } else {
-        // Success, invoke onSuccess with result
         onSuccess(result);
       }
     } catch (e) {
@@ -84,10 +79,32 @@ class FlutterMediaStore {
 
   /// Check and request necessary permissions
   Future<bool> _checkAndRequestPermissions() async {
-    // Check for storage permissions (e.g., WRITE_EXTERNAL_STORAGE on Android)
-    PermissionStatus status = await Permission.storage.request();
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final sdkInt = await _getAndroidSdkVersion();
 
-    // Check if permission is granted
-    return status.isGranted;
+      if (sdkInt >= 30) {
+        // Android 11 and above
+        final status = await Permission.manageExternalStorage.request();
+        return status.isGranted;
+      } else {
+        // Android 10 and below
+        final status = await Permission.storage.request();
+        return status.isGranted;
+      }
+    }
+
+    return true; // No permissions needed for non-Android platforms
+  }
+
+  /// Method to get Android SDK version
+  Future<int> _getAndroidSdkVersion() async {
+    final deviceInfoPlugin = DeviceInfoPlugin();
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final androidInfo = await deviceInfoPlugin.androidInfo;
+      return androidInfo.version.sdkInt; // Fetch the SDK version
+    }
+
+    return 0; // Non-Android or unknown platform
   }
 }

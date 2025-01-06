@@ -1,6 +1,6 @@
 name: flutter_media_store
 description: "A Flutter plugin to save and manage files in Android MediaStore seamlessly."
-version: 1.1.0
+version: 1.2.0
 homepage: https://github.com/Rajkumarlohar65/flutter_media_store.git
 
 environment:
@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
   permission_handler: ^11.3.1
+  device_info_plus: ^11.2.0
+
 
 dev_dependencies:
   flutter_test:

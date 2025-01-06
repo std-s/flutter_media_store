@@ -1,3 +1,11 @@
+## 1.2.0
+
+* **Added** support for `MANAGE_EXTERNAL_STORAGE` permission for Android 11+.
+* **Improved** permission handling with dynamic requests based on Android version.
+* **Bug fixes** for better performance and compatibility with scoped storage.
+* **Updated** permission flow to handle Android 10 and below with `READ_EXTERNAL_STORAGE` and `WRITE_EXTERNAL_STORAGE`.
+
+
 ## 1.1.0
 
 * **Added** `appendDataToFile` method for appending data to existing files in **MediaStore**.
