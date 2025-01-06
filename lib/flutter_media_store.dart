@@ -1,6 +1,5 @@
 import 'package:flutter_media_store/flutter_media_store_platform_interface.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart'; // For Platform checks
 
 class FlutterMediaStore {
@@ -80,7 +79,7 @@ class FlutterMediaStore {
   /// Check and request necessary permissions
   Future<bool> _checkAndRequestPermissions() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      final sdkInt = await _getAndroidSdkVersion();
+      final sdkInt = await _getAndroidSdkVersionNative();
 
       if (sdkInt >= 30) {
         // Android 11 and above
@@ -96,15 +95,17 @@ class FlutterMediaStore {
     return true; // No permissions needed for non-Android platforms
   }
 
-  /// Method to get Android SDK version
-  Future<int> _getAndroidSdkVersion() async {
-    final deviceInfoPlugin = DeviceInfoPlugin();
+  /// Native method to get the SDK version
+  Future<int> _getAndroidSdkVersionNative() async {
 
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      final androidInfo = await deviceInfoPlugin.androidInfo;
-      return androidInfo.version.sdkInt; // Fetch the SDK version
+    try{
+      final result = await FlutterMediaStorePlatformInterface.instance
+          .getAndroidSdkVersionNative();
+
+      return result;
+    }catch(e){
+
+      return 0;
     }
-
-    return 0; // Non-Android or unknown platform
   }
 }

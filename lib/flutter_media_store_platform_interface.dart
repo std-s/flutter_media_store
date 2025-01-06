@@ -36,4 +36,6 @@ abstract class FlutterMediaStorePlatformInterface extends PlatformInterface {
     required Function(String errorMessage)
         onError, // Callback for error with message
   });
+
+  Future<int> getAndroidSdkVersionNative();
 }

@@ -36,6 +36,12 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
   // Method to handle method calls from Flutter
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     when (call.method) {
+
+      "getAndroidSdkVersion" -> {
+        val sdkVersion = getAndroidSdkVersion()
+        result.success(sdkVersion)
+      }
+
       // Method to save a file to MediaStore
       "saveFileToMediaStore" -> {
         val rootFolderName = call.argument<String>("rootFolderName")
@@ -68,6 +74,11 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
 
       else -> result.notImplemented()
     }
+  }
+
+  // New method to get the current Android SDK version
+  private fun getAndroidSdkVersion(): Int {
+    return Build.VERSION.SDK_INT
   }
 
   // Method to save a file to MediaStore, using MediaStore API for Android 10 and above

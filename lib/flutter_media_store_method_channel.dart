@@ -47,4 +47,13 @@ class FlutterMediaStoreMethodChannel
 
     return result ?? "Failed";
   }
+
+  @override
+  Future<int> getAndroidSdkVersionNative() async{
+
+    final result = await _channel.invokeMethod<int>('getAndroidSdkVersion');
+
+    return result ?? 0;
+  }
+
 }
