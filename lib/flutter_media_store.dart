@@ -97,14 +97,12 @@ class FlutterMediaStore {
 
   /// Native method to get the SDK version
   Future<int> _getAndroidSdkVersionNative() async {
-
-    try{
+    try {
       final result = await FlutterMediaStorePlatformInterface.instance
           .getAndroidSdkVersionNative();
 
       return result;
-    }catch(e){
-
+    } catch (e) {
       return 0;
     }
   }
