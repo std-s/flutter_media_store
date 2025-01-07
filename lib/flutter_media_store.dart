@@ -16,32 +16,9 @@ class FlutterMediaStore {
     }
   }
 
-  // Method to open the file picker and return the selected file URI
-  Future<String> pickFile({
-    required Function(String uri) onFilePicked,
-    required Function(String errorMessage) onError,
-  }) async {
-    try {
-      final result = await FlutterMediaStorePlatformInterface.instance.pickFile(
-        onFilePicked: onFilePicked,
-        onError: onError,
-      );
-
-      if (result.startsWith("FILE_PICK_CANCELLED") || result.startsWith("FILE_PICK_ERROR")) {
-        onError(result); // Error callback if no file is picked
-        return result; // Return the error result as a String
-      } else {
-        onFilePicked(result); // Success callback with the picked file URI
-        return result; // Return the picked file URI as a String
-      }
-    } catch (e) {
-      onError('Error: ${e.toString()}'); // Error callback for any unexpected exceptions
-      return 'Error: ${e.toString()}'; // Return the error message as a String
-    }
-  }
-
-
   /// Save a file to the MediaStore with success and error handling.
+
+
   Future<void> saveFile({
     required List<int> fileData,
     required String mimeType,
@@ -82,8 +59,8 @@ class FlutterMediaStore {
       onError('Error: ${e.toString()}');
     }
   }
-
   /// Append data to an existing file in the MediaStore
+
   Future<void> appendDataToFile({
     required String uri,
     required List<int> fileData,
@@ -113,8 +90,8 @@ class FlutterMediaStore {
       onError('Error: ${e.toString()}');
     }
   }
-
   /// Check and request necessary permissions
+
   Future<bool> _checkAndRequestPermissions() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final sdkInt = await _getAndroidSdkVersionNative();
@@ -132,4 +109,31 @@ class FlutterMediaStore {
 
     return true; // No permissions needed for non-Android platforms
   }
+
+  // Method to open the file picker and return the selected file URI(s)
+  Future<List<String>> pickFile({
+    required bool multipleSelect,
+    required Function(List<String> uris) onFilesPicked,
+    required Function(String errorMessage) onError,
+  }) async {
+    try {
+      List<String> result = await FlutterMediaStorePlatformInterface.instance.pickFile(
+          multipleSelect: multipleSelect,
+          onFilesPicked: onFilesPicked,
+          onError: onError
+      );
+
+      if (result.isNotEmpty) {
+        onFilesPicked(result); // Success callback with the picked file URIs
+        return result; // Return the list of selected file URIs
+      } else {
+        onError('No files selected or an error occurred');
+        return []; // Return an empty list on error
+      }
+    } catch (e) {
+      onError('Error: ${e.toString()}');
+      return []; // Return an empty list on exception
+    }
+  }
 }
+

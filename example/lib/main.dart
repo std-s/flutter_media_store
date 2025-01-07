@@ -16,6 +16,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _message = 'Press the button to save a file';
   String _filePickerMessage = 'Press the pick button';
+  List<String> fileUris = [];
   String rootFolderName = 'FlutterMediaStore';
 
   /// Update the message state
@@ -238,11 +239,15 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton.icon(
                   onPressed: () {
                     FlutterMediaStore().pickFile(
-                      onFilePicked: (String uri) {
-                        _updateFilePickerMessage('✅ File picked successfully: $uri');
+                      multipleSelect: false,
+                      onFilesPicked: (List<String> uris) {
+                        _updateFilePickerMessage('✅ Files picked successfully');
+                        setState(() {
+                          fileUris = uris; // Store the picked file URIs
+                        });
                       },
                       onError: (String error) {
-                        _updateFilePickerMessage('❌ Failed to pick file: $error');
+                        _updateFilePickerMessage('❌ Failed to pick file');
                       },
                     );
                   },
@@ -262,10 +267,22 @@ class _MyAppState extends State<MyApp> {
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),
-
-
-
-
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: fileUris.isNotEmpty
+                      ? Column(
+                    children: List.generate(fileUris.length, (index) {
+                      return ListTile(
+                        title: Text('Index $index: ${fileUris[index]}'),
+                      );
+                    }),
+                  )
+                      : const Text(
+                    "No files picked yet.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
               ],
             ),
           ),

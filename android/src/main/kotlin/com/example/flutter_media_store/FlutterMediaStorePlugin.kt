@@ -49,9 +49,12 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
       }
 
       "pickFile" -> {
+        // Get the argument with a default value to handle null cases
+        val multipleSelect = call.argument<Boolean>("multipleSelect") ?: false  // Fallback to false if null
         pendingResult = result
-        pickFile()
+        pickFile(multipleSelect)
       }
+
 
       // Method to save a file to MediaStore
       "saveFileToMediaStore" -> {
@@ -92,16 +95,7 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     return Build.VERSION.SDK_INT
   }
 
-  private fun pickFile() {
-    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-      type = "*/*"
-      addCategory(Intent.CATEGORY_OPENABLE)
-    }
-    activity?.startActivityForResult(intent, FILE_PICKER_REQUEST_CODE)
-  }
-
-
-  // Method to save a file to MediaStore, using MediaStore API for Android 10 and above
+   // Method to save a file to MediaStore, using MediaStore API for Android 10 and above
   private fun saveFileToMediaStore(
     fileData: ByteArray,
     fileName: String,
@@ -236,16 +230,51 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
   }
 
+  // Update the pickFile method to accept a parameter for multiple file selection
+  private fun pickFile(multipleSelect: Boolean) {
+    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+      type = "*/*"
+      addCategory(Intent.CATEGORY_OPENABLE)
+      if (multipleSelect) {
+        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)  // Allow multiple selection
+      }
+    }
+    activity?.startActivityForResult(intent, FILE_PICKER_REQUEST_CODE)
+  }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
     activityPluginBinding = binding
+
     activityPluginBinding?.addActivityResultListener { requestCode, resultCode, data ->
+      Log.d("FlutterMediaStore", "Activity result listener triggered with requestCode: $requestCode, resultCode: $resultCode")
+
       if (requestCode == FILE_PICKER_REQUEST_CODE) {
         if (resultCode == Activity.RESULT_OK) {
-          val uri = data?.data
-          pendingResult?.success(uri?.toString())
+          Log.d("FlutterMediaStore", "File pick successful")
+
+          val uriList = mutableListOf<String>()
+          if (data?.clipData != null) {
+            Log.d("FlutterMediaStore", "Multiple files selected")
+            for (i in 0 until data.clipData?.itemCount!!) {
+              val uri = data.clipData?.getItemAt(i)?.uri.toString()
+              Log.d("FlutterMediaStore", "URI[$i]: $uri")
+              uriList.add(uri)
+            }
+          } else {
+            Log.d("FlutterMediaStore", "Single file selected")
+            val uri = data?.data?.toString()
+            uri?.let {
+              Log.d("FlutterMediaStore", "URI: $uri")
+              uriList.add(it)
+            }
+          }
+
+          // Send the list of URIs back as List<String>
+          Log.d("FlutterMediaStore", "Sending URI list: $uriList")
+          pendingResult?.success(uriList)
         } else {
+          Log.d("FlutterMediaStore", "File pick cancelled or failed")
           pendingResult?.error("FILE_PICK_ERROR", "File picking cancelled", null)
         }
         true
@@ -254,7 +283,6 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
       }
     }
   }
-
   override fun onDetachedFromActivity() {
     activity = null
     activityPluginBinding = null

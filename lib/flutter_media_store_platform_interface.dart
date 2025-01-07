@@ -19,8 +19,9 @@ abstract class FlutterMediaStorePlatformInterface extends PlatformInterface {
   Future<int> getAndroidSdkVersionNative();
 
   // Method to open the file picker and return the selected file URI
-  Future<String> pickFile({
-    required Function(String uri) onFilePicked,
+  Future<List<String>> pickFile({
+    required bool multipleSelect,
+    required Function(List<String> uris) onFilesPicked,
     required Function(String errorMessage) onError,
   });
 

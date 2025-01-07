@@ -13,18 +13,33 @@ class FlutterMediaStoreMethodChannel
     return result ?? 0;
   }
 
-  // Method to open the file picker and return the selected file URI
   @override
-  Future<String> pickFile({
-    required Function(String uri) onFilePicked,
+  Future<List<String>> pickFile({
+    required bool multipleSelect,
+    required Function(List<String> uris) onFilesPicked,
     required Function(String errorMessage) onError,
   }) async {
-    final result = await _channel.invokeMethod<String>(
-      'pickFile', {},
-    );
+    try {
+      // Call the native platform method to pick files
+      final result = await _channel.invokeMethod('pickFile', {
+        'multipleSelect': multipleSelect,
+      });
 
-    return result ?? "Failed";
+      // Check if the result is a List<Object?> and safely cast to List<String>
+      if (result is List) {
+        // Safely cast the result to List<String>
+        List<String> uris = List<String>.from(result);
+        return uris;
+      } else {
+        onError("Expected a list of URIs but got something else.");
+        return [];
+      }
+    } catch (e) {
+      onError('Error: ${e.toString()}');
+      return [];
+    }
   }
+
 
   @override
   Future<String> saveFileToMediaStore({
