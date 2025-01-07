@@ -2,6 +2,11 @@
 
 Welcome to the **Flutter Media Store Plugin**! This plugin allows you to save various types of files (images, videos, audio, documents, etc.) directly to the device's **Android MediaStore**, enabling seamless integration with Android's storage system. It supports **all Android versions**.
 
+With this plugin, you can:
+- **Save files with data** (images, videos, audio, documents, etc.).
+- **Insert new data into existing files**.
+
+
 ## Features
 
 - **Save files to MediaStore**: Easily save files such as images, audio, video, CSV, text, and more.
@@ -13,33 +18,32 @@ Welcome to the **Flutter Media Store Plugin**! This plugin allows you to save va
 ## Scoped Storage and MediaStore
 
 ### Scoped Storage
-
-**Scoped Storage** is a feature introduced in Android 10 (API level 29) to improve user privacy and security. It limits direct access to the file system, allowing apps to access only specific types of data and files in designated locations, such as the app’s private storage and the public directories within shared storage (like photos, videos, and documents). This prevents apps from accessing sensitive data in areas like the root of the file system or other apps' private storage.
+Introduced in **Android 10 (API 29)**, **Scoped Storage** enhances privacy by restricting apps' access to files. Apps can only access private storage and designated public directories (e.g., photos, videos). This prevents access to sensitive system or other apps' private data.
 
 ### MediaStore
+**MediaStore** allows secure interaction with media files (images, audio, videos) on Android devices, adhering to **Scoped Storage** rules. Apps can read/write media files in structured, secure collections without accessing arbitrary file locations.
 
-**MediaStore** is part of Android’s content provider system that provides access to media files such as images, audio, and videos stored on the device. With **MediaStore**, apps can read and write media files while complying with scoped storage restrictions. Instead of directly writing to arbitrary locations on the device, MediaStore allows apps to interact with media content in a structured and secure manner.
+### Flutter Media Store Plugin
+The **Flutter Media Store Plugin** integrates seamlessly with **Scoped Storage** and **MediaStore**, enabling compliant and secure file management.
 
-### Flutter Media Store Plugin & Scoped Storage Integration
+#### Benefits:
+- **Automatic Permissions**: Handles storage permissions efficiently.
+- **Multi-File Type Support**: Save and retrieve images, audio, video, and documents in **MediaStore**.
+- **Scoped Storage Compliance**: Ensures secure, structured file access aligned with Android's privacy policies.
 
-The **Flutter Media Store Plugin** leverages **Scoped Storage** to manage the storage of files (such as images, videos, and audio) directly within the device’s **Android MediaStore**. This integration ensures that your app can save files in a manner that is compliant with Android's scoped storage model, allowing you to access and save files within the appropriate media collections like images, videos, and audio.
-
-#### Key Benefits:
-
-- **Automatic Permission Handling**: The plugin checks for the necessary permissions (like `READ_EXTERNAL_STORAGE` and `WRITE_EXTERNAL_STORAGE`) to interact with the MediaStore and ensures that the app complies with Android's storage policies.
-
-- **Cross-file Type Support**: It allows the saving of various file types (images, audio, video, documents, and more) directly into Android’s **MediaStore**. This makes it easy to manage and retrieve files from the system's media collections.
-
-- **Scoped Storage Compliant**: By utilizing the MediaStore API, the plugin ensures that files are saved in a structured way within public directories that are accessible according to scoped storage rules. This ensures that the app does not have access to other apps' data or private file locations, which aligns with Android's privacy-centric storage model.
-
-This approach ensures that the **Flutter Media Store Plugin** is fully compatible with modern Android storage policies while providing an easy-to-use method for saving and managing media files directly within the Android system's storage framework.
+This plugin simplifies file management while adhering to modern Android storage standards.
 
 
-## Demo GIF
+## Demo GIFs
 
-Watch this demo GIF to see the plugin in action:
+Watch these demo GIFs to see the plugin in action on various Android versions:
 
-![Flutter Media Store Demo](https://ik.imagekit.io/puy8cmyj2/flutter_media_store.gif?updatedAt=1735888257697)
+| Android 9 | Android 12 | Android 14 |
+|-----------|------------|------------|
+| ![Android 9 Demo](https://ik.imagekit.io/puy8cmyj2/android_9_rec.gif?tr=h-500&updatedAt=1736167231380) | ![Android 12 Demo](https://ik.imagekit.io/puy8cmyj2/android_12_rec.gif?tr=h-500&updatedAt=1736167231129) | ![Android 14 Demo](https://ik.imagekit.io/puy8cmyj2/android_14_rec.gif?tr=h-500&updatedAt=1736167231785) |
+
+
+
 
 ## Installation
 
@@ -79,7 +83,7 @@ Once the plugin is installed and permissions are configured, you can start savin
 
 ### Example Code
 
-The main method to save a file is `saveFile` & `appendDataToFile`. Here's an example of how to use it:
+The main methods to save a file are `saveFile` and `appendDataToFile`. Here's an example of how to use them:
 
 ```dart
 Future<void> saveFile({
@@ -98,21 +102,19 @@ Future<void> saveFile({
 
       // Save the file using the plugin and handle success/error via callbacks
       await flutterMediaStorePlugin.saveFile(
-         fileData: fileData,
+         fileData: fileData,  // **saveFile** saves the file with data and returns a URI
          mimeType: mimeType,
          rootFolderName: rootFolderName,
          folderName: folderName,
          fileName: fileName,
          onSuccess: (String uri, String filePath) {
             // Callbacks on success
-            _updateMessage('✅ File saved successfully: $filePath.toString()');
-
+            print('✅ File saved successfully: $filePath.toString()');
             print('uri: ${uri.toString()}');
-            print('path: ${filePath.toString()}');
 
-            // Appends data to an existing file in the MediaStore using the given URI.
+            // **appendDataToFile** is used to append new data to the existing file using the returned URI
             flutterMediaStorePlugin.appendDataToFile(
-               uri: uri,
+               uri: uri,  // append new data using the URI returned by saveFile
                fileData: fileData, // append new data
                onSuccess: (result) {
                   print(result);
@@ -125,34 +127,49 @@ Future<void> saveFile({
          },
          onError: (String errorMessage) {
             // Callbacks on error
-            _updateMessage('❌ Failed to save file: $errorMessage');
+            print('❌ Failed to save file: $errorMessage');
          },
       );
    } catch (e) {
       // Catch and log any errors that may occur during the process
-      _updateMessage('❌ Error loading file from assets: ${e.toString()}');
+      print('❌ Error loading file from assets: ${e.toString()}');
    }
 }
 ```
 
+### Example Explanation
+
+- **Convert Data to Bytes**:  
+  Before saving or appending data, you must convert the data (e.g., an image, video, audio, etc.) to bytes. In this example, the `rootBundle.load(assetPath)` method loads the file from assets, and then the `ByteData` is converted to `Uint8List` (bytes) using `byteData.buffer.asUint8List()`. This byte array is then passed to `saveFile` or `appendDataToFile`.
+
+- **`saveFile`**:  
+  This method saves a file with the data in byte format and returns a **URI** that identifies the saved file in the MediaStore.
+
+- **`appendDataToFile`**:  
+  This method appends new data to an existing file. The new data is passed as bytes, and the method uses the **URI** from the `saveFile` method to target the file for appending.
+
+
 ## MIME Type List
+MIME types (Multipurpose Internet Mail Extensions) are used to specify the type of content or file format. It helps applications and services understand the type of file they are handling and ensures the correct handling and processing of files.
+
 Below is a list of supported MIME types for different file types:
 
 ```xml
    PNG Image: image/png
-        JPG Image: image/jpeg
-        PDF File: application/pdf
-        CSV File: text/csv
-        TXT File: text/plain
-        XML File: application/xml
-        JSON File: application/json
-        MP3 File: audio/mpeg
-        MP4 Video: video/mp4
-        ZIP Archive: application/zip
-        TAR Archive: application/x-tar
+   JPG Image: image/jpeg
+   PDF File: application/pdf
+   CSV File: text/csv
+   TXT File: text/plain
+   XML File: application/xml
+   JSON File: application/json
+   MP3 File: audio/mpeg
+   MP4 Video: video/mp4
+   ZIP Archive: application/zip
+   TAR Archive: application/x-tar
+   DB File: application/octet-stream
 ```
+You can also use other MIME types depending on the file format you are working with. Simply provide the appropriate MIME type for the content to ensure proper handling and compatibility.
 
-Use the appropriate MIME type for the file format you are saving.
 
 ### MIME Use Example
 
@@ -160,14 +177,14 @@ Use the appropriate MIME type for the file format you are saving.
 
 ```dart
 ElevatedButton(
-      onPressed: () => saveFile(
-      assetPath: 'assets/csv/sample.csv',
-      mimeType: 'text/csv',
-      fileName: 'sample.csv',
-      folderName: 'Csv',
-      rootFolderName: rootFolderName,
-   ),
-child: const Text('Save CSV File'),
+onPressed: () => saveFile(
+assetPath: 'assets/img/sample1.png',
+mimeType: 'image/png',
+fileName: 'sample1',
+folderName: 'Images/png',
+rootFolderName: rootFolderName,
+),
+child: const Text('Save PNG Image'),
 ),
 ```
 

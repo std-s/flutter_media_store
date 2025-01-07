@@ -59,6 +59,7 @@ flutter:
     - assets/sql/sample.sql
     - assets/tar/sample.tar
     - assets/zip/sample.zip
+    - assets/db/sample_database.db
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

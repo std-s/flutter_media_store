@@ -211,6 +211,16 @@ class _MyAppState extends State<MyApp> {
                       ),
                       child: const Text('Save SQL File'),
                     ),
+                    ElevatedButton(
+                      onPressed: () => saveFile(
+                        assetPath: 'assets/db/sample_database.db',
+                        mimeType: 'application/octet-stream',
+                        fileName: 'sample.db',
+                        folderName: 'DB',
+                        rootFolderName: rootFolderName,
+                      ),
+                      child: const Text('Save DB File'),
+                    ),
                   ],
                 ),
               ],
