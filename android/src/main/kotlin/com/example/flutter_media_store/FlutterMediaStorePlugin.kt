@@ -1,13 +1,15 @@
 package com.example.flutter_media_store
 
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.annotation.NonNull
-import androidx.core.content.ContextCompat
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -20,26 +22,35 @@ import java.io.IOException
 class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
   private lateinit var channel: MethodChannel
   private var applicationContext: Context? = null
+  private var activity: Activity? = null
+  private var activityPluginBinding: ActivityPluginBinding? = null
+  private var pendingResult: MethodChannel.Result? = null
 
-  // Method called when the plugin is attached to the engine.
+  companion object {
+    private const val FILE_PICKER_REQUEST_CODE = 1001
+  }
+
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     applicationContext = flutterPluginBinding.applicationContext
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "com.example.flutter_media_store/media_store")
     channel.setMethodCallHandler(this)
   }
 
-  // Method called when the plugin is detached from the engine.
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
   }
 
-  // Method to handle method calls from Flutter
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     when (call.method) {
 
       "getAndroidSdkVersion" -> {
         val sdkVersion = getAndroidSdkVersion()
         result.success(sdkVersion)
+      }
+
+      "pickFile" -> {
+        pendingResult = result
+        pickFile()
       }
 
       // Method to save a file to MediaStore
@@ -80,6 +91,15 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
   private fun getAndroidSdkVersion(): Int {
     return Build.VERSION.SDK_INT
   }
+
+  private fun pickFile() {
+    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+      type = "*/*"
+      addCategory(Intent.CATEGORY_OPENABLE)
+    }
+    activity?.startActivityForResult(intent, FILE_PICKER_REQUEST_CODE)
+  }
+
 
   // Method to save a file to MediaStore, using MediaStore API for Android 10 and above
   private fun saveFileToMediaStore(
@@ -216,21 +236,36 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
   }
 
-  // ActivityAware methods for handling activity lifecycle events
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    // No activity-specific logic for now
+    activity = binding.activity
+    activityPluginBinding = binding
+    activityPluginBinding?.addActivityResultListener { requestCode, resultCode, data ->
+      if (requestCode == FILE_PICKER_REQUEST_CODE) {
+        if (resultCode == Activity.RESULT_OK) {
+          val uri = data?.data
+          pendingResult?.success(uri?.toString())
+        } else {
+          pendingResult?.error("FILE_PICK_ERROR", "File picking cancelled", null)
+        }
+        true
+      } else {
+        false
+      }
+    }
   }
 
   override fun onDetachedFromActivity() {
-    // Clean up activity-related references if any
+    activity = null
+    activityPluginBinding = null
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-    // Handle activity detach for configuration changes if necessary
+    activity = null
+    activityPluginBinding = null
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-    // Handle activity re-attachment after configuration changes if necessary
+    onAttachedToActivity(binding)
   }
 }

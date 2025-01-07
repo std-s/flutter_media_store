@@ -7,6 +7,26 @@ class FlutterMediaStoreMethodChannel
       const MethodChannel('com.example.flutter_media_store/media_store');
 
   @override
+  Future<int> getAndroidSdkVersionNative() async {
+    final result = await _channel.invokeMethod<int>('getAndroidSdkVersion');
+
+    return result ?? 0;
+  }
+
+  // Method to open the file picker and return the selected file URI
+  @override
+  Future<String> pickFile({
+    required Function(String uri) onFilePicked,
+    required Function(String errorMessage) onError,
+  }) async {
+    final result = await _channel.invokeMethod<String>(
+      'pickFile', {},
+    );
+
+    return result ?? "Failed";
+  }
+
+  @override
   Future<String> saveFileToMediaStore({
     required List<int> fileData,
     required String mimeType,
@@ -31,6 +51,7 @@ class FlutterMediaStoreMethodChannel
   }
 
   /// Append data to an existing file in the MediaStore
+  @override
   Future<String> appendDataToMediaStore({
     required String uri,
     required List<int> fileData,
@@ -48,10 +69,5 @@ class FlutterMediaStoreMethodChannel
     return result ?? "Failed";
   }
 
-  @override
-  Future<int> getAndroidSdkVersionNative() async {
-    final result = await _channel.invokeMethod<int>('getAndroidSdkVersion');
 
-    return result ?? 0;
-  }
 }

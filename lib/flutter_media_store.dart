@@ -3,6 +3,44 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/foundation.dart'; // For Platform checks
 
 class FlutterMediaStore {
+
+  /// Native method to get the SDK version
+  Future<int> _getAndroidSdkVersionNative() async {
+    try {
+      final result = await FlutterMediaStorePlatformInterface.instance
+          .getAndroidSdkVersionNative();
+
+      return result;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Method to open the file picker and return the selected file URI
+  Future<String> pickFile({
+    required Function(String uri) onFilePicked,
+    required Function(String errorMessage) onError,
+  }) async {
+    try {
+      final result = await FlutterMediaStorePlatformInterface.instance.pickFile(
+        onFilePicked: onFilePicked,
+        onError: onError,
+      );
+
+      if (result.startsWith("FILE_PICK_CANCELLED") || result.startsWith("FILE_PICK_ERROR")) {
+        onError(result); // Error callback if no file is picked
+        return result; // Return the error result as a String
+      } else {
+        onFilePicked(result); // Success callback with the picked file URI
+        return result; // Return the picked file URI as a String
+      }
+    } catch (e) {
+      onError('Error: ${e.toString()}'); // Error callback for any unexpected exceptions
+      return 'Error: ${e.toString()}'; // Return the error message as a String
+    }
+  }
+
+
   /// Save a file to the MediaStore with success and error handling.
   Future<void> saveFile({
     required List<int> fileData,
@@ -93,17 +131,5 @@ class FlutterMediaStore {
     }
 
     return true; // No permissions needed for non-Android platforms
-  }
-
-  /// Native method to get the SDK version
-  Future<int> _getAndroidSdkVersionNative() async {
-    try {
-      final result = await FlutterMediaStorePlatformInterface.instance
-          .getAndroidSdkVersionNative();
-
-      return result;
-    } catch (e) {
-      return 0;
-    }
   }
 }
