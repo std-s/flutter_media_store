@@ -90,7 +90,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('MediaStore File Saver'),
+          title: const Text('Flutter Media Store'),
         ),
         body: Center(
           child: SingleChildScrollView(
@@ -239,7 +239,7 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton.icon(
                   onPressed: () {
                     FlutterMediaStore().pickFile(
-                      multipleSelect: false,
+                      multipleSelect: true,
                       onFilesPicked: (List<String> uris) {
                         _updateFilePickerMessage('✅ Files picked successfully');
                         setState(() {

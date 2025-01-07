@@ -48,14 +48,6 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
         result.success(sdkVersion)
       }
 
-      "pickFile" -> {
-        // Get the argument with a default value to handle null cases
-        val multipleSelect = call.argument<Boolean>("multipleSelect") ?: false  // Fallback to false if null
-        pendingResult = result
-        pickFile(multipleSelect)
-      }
-
-
       // Method to save a file to MediaStore
       "saveFileToMediaStore" -> {
         val rootFolderName = call.argument<String>("rootFolderName")
@@ -84,6 +76,13 @@ class FlutterMediaStorePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
         } else {
           result.error("ARGUMENT_ERROR", "Invalid arguments", null)
         }
+      }
+
+      "pickFile" -> {
+        // Get the argument with a default value to handle null cases
+        val multipleSelect = call.argument<Boolean>("multipleSelect") ?: false  // Fallback to false if null
+        pendingResult = result
+        pickFile(multipleSelect)
       }
 
       else -> result.notImplemented()

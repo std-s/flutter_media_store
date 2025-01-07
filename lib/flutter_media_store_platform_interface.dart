@@ -18,14 +18,6 @@ abstract class FlutterMediaStorePlatformInterface extends PlatformInterface {
 
   Future<int> getAndroidSdkVersionNative();
 
-  // Method to open the file picker and return the selected file URI
-  Future<List<String>> pickFile({
-    required bool multipleSelect,
-    required Function(List<String> uris) onFilesPicked,
-    required Function(String errorMessage) onError,
-  });
-
-
   Future<String> saveFileToMediaStore({
     required String rootFolderName,
     required String folderName,
@@ -45,6 +37,13 @@ abstract class FlutterMediaStorePlatformInterface extends PlatformInterface {
         onSuccess, // Callback for success with result
     required Function(String errorMessage)
         onError, // Callback for error with message
+  });
+
+  // Method to open the file picker and return the selected file URI
+  Future<List<String>> pickFile({
+    required bool multipleSelect,
+    required Function(List<String> uris) onFilesPicked,
+    required Function(String errorMessage) onError,
   });
 
 }
