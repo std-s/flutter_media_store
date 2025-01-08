@@ -7,6 +7,13 @@ class FlutterMediaStoreMethodChannel
       const MethodChannel('com.example.flutter_media_store/media_store');
 
   @override
+  Future<int> getAndroidSdkVersionNative() async {
+    final result = await _channel.invokeMethod<int>('getAndroidSdkVersion');
+
+    return result ?? 0;
+  }
+
+  @override
   Future<String> saveFileToMediaStore({
     required List<int> fileData,
     required String mimeType,
@@ -31,6 +38,7 @@ class FlutterMediaStoreMethodChannel
   }
 
   /// Append data to an existing file in the MediaStore
+  @override
   Future<String> appendDataToMediaStore({
     required String uri,
     required List<int> fileData,
@@ -49,9 +57,29 @@ class FlutterMediaStoreMethodChannel
   }
 
   @override
-  Future<int> getAndroidSdkVersionNative() async {
-    final result = await _channel.invokeMethod<int>('getAndroidSdkVersion');
+  Future<List<String>> pickFile({
+    required bool multipleSelect,
+    required Function(List<String> uris) onFilesPicked,
+    required Function(String errorMessage) onError,
+  }) async {
+    try {
+      // Call the native platform method to pick files
+      final result = await _channel.invokeMethod('pickFile', {
+        'multipleSelect': multipleSelect,
+      });
 
-    return result ?? 0;
+      // Check if the result is a List<Object?> and safely cast to List<String>
+      if (result is List) {
+        // Safely cast the result to List<String>
+        List<String> uris = List<String>.from(result);
+        return uris;
+      } else {
+        onError("Expected a list of URIs but got something else.");
+        return [];
+      }
+    } catch (e) {
+      onError('Error: ${e.toString()}');
+      return [];
+    }
   }
 }

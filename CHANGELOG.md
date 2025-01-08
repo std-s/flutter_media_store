@@ -1,3 +1,9 @@
+## 1.3.0
+
+* **Added** support for picking files directly from the device's MediaStore.
+  - Allows users to select files such as images, audio, video, and documents.
+  - Supports both **single select** and **multi-select** options.
+
 ## 1.2.1
 
 * **Removed** dependency on device_info_plus and replaced it with a native method to retrieve the Android SDK version.

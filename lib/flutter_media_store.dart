@@ -3,7 +3,20 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/foundation.dart'; // For Platform checks
 
 class FlutterMediaStore {
+  /// Native method to get the SDK version
+  Future<int> _getAndroidSdkVersionNative() async {
+    try {
+      final result = await FlutterMediaStorePlatformInterface.instance
+          .getAndroidSdkVersionNative();
+
+      return result;
+    } catch (e) {
+      return 0;
+    }
+  }
+
   /// Save a file to the MediaStore with success and error handling.
+
   Future<void> saveFile({
     required List<int> fileData,
     required String mimeType,
@@ -46,6 +59,7 @@ class FlutterMediaStore {
   }
 
   /// Append data to an existing file in the MediaStore
+
   Future<void> appendDataToFile({
     required String uri,
     required List<int> fileData,
@@ -77,6 +91,7 @@ class FlutterMediaStore {
   }
 
   /// Check and request necessary permissions
+
   Future<bool> _checkAndRequestPermissions() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final sdkInt = await _getAndroidSdkVersionNative();
@@ -95,15 +110,29 @@ class FlutterMediaStore {
     return true; // No permissions needed for non-Android platforms
   }
 
-  /// Native method to get the SDK version
-  Future<int> _getAndroidSdkVersionNative() async {
+  // Method to open the file picker and return the selected file URI(s)
+  Future<List<String>> pickFile({
+    required bool multipleSelect,
+    required Function(List<String> uris) onFilesPicked,
+    required Function(String errorMessage) onError,
+  }) async {
     try {
-      final result = await FlutterMediaStorePlatformInterface.instance
-          .getAndroidSdkVersionNative();
+      List<String> result = await FlutterMediaStorePlatformInterface.instance
+          .pickFile(
+              multipleSelect: multipleSelect,
+              onFilesPicked: onFilesPicked,
+              onError: onError);
 
-      return result;
+      if (result.isNotEmpty) {
+        onFilesPicked(result); // Success callback with the picked file URIs
+        return result; // Return the list of selected file URIs
+      } else {
+        onError('No files selected or an error occurred');
+        return []; // Return an empty list on error
+      }
     } catch (e) {
-      return 0;
+      onError('Error: ${e.toString()}');
+      return []; // Return an empty list on exception
     }
   }
 }

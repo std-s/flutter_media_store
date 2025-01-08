@@ -15,12 +15,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _message = 'Press the button to save a file';
+  String _filePickerMessage = 'Press the pick button';
+  List<String> fileUris = [];
   String rootFolderName = 'FlutterMediaStore';
 
   /// Update the message state
   void _updateMessage(String newMessage) {
     setState(() {
       _message = newMessage;
+    });
+  }
+
+  /// Update the message state
+  void _updateFilePickerMessage(String newMessage) {
+    setState(() {
+      _filePickerMessage = newMessage;
     });
   }
 
@@ -81,7 +90,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('MediaStore File Saver'),
+          title: const Text('Flutter Media Store'),
         ),
         body: Center(
           child: SingleChildScrollView(
@@ -222,6 +231,60 @@ class _MyAppState extends State<MyApp> {
                       child: const Text('Save DB File'),
                     ),
                   ],
+                ),
+
+                const SizedBox(
+                  height: 20,
+                ),
+
+                ElevatedButton.icon(
+                  onPressed: () {
+                    /// Pick your file
+                    FlutterMediaStore().pickFile(
+                      multipleSelect: true,
+                      onFilesPicked: (List<String> uris) {
+                        _updateFilePickerMessage('✅ Files picked successfully');
+                        setState(() {
+                          fileUris = uris; // Store the picked file URIs
+                        });
+                      },
+                      onError: (String error) {
+                        _updateFilePickerMessage('❌ Failed to pick file');
+                      },
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black, // Text color
+                    backgroundColor: Colors.yellow, // Button background color
+                  ),
+                  icon: const Icon(Icons.file_present,
+                      color: Colors.black), // Add the icon
+                  label: const Text("Pick file"), // Add the label
+                ),
+                const Divider(height: 20, thickness: 2),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    _filePickerMessage,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: fileUris.isNotEmpty
+                      ? Column(
+                          children: List.generate(fileUris.length, (index) {
+                            return ListTile(
+                              title: Text('Index $index: ${fileUris[index]}'),
+                            );
+                          }),
+                        )
+                      : const Text(
+                          "No files picked yet.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),
