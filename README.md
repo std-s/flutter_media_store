@@ -58,7 +58,7 @@ To get started with the **Flutter Media Store Plugin**, follow these steps:
     dependencies:
       flutter:
         sdk: flutter
-      flutter_media_store: ^1.3.0
+      flutter_media_store: ^1.3.1
     ```
 
 2. **Run** `flutter pub get` to fetch the plugin and its dependencies.
@@ -236,7 +236,7 @@ By leveraging URIs in your application, you ensure robust and secure file handli
 
 ## License
 
-This project is licensed under the BSD License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
 ## Authors
