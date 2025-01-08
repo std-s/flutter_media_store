@@ -230,14 +230,16 @@ class _MyAppState extends State<MyApp> {
                       ),
                       child: const Text('Save DB File'),
                     ),
-
                   ],
                 ),
 
-                const SizedBox(height: 20,),
+                const SizedBox(
+                  height: 20,
+                ),
 
                 ElevatedButton.icon(
                   onPressed: () {
+                    /// Pick your file
                     FlutterMediaStore().pickFile(
                       multipleSelect: true,
                       onFilesPicked: (List<String> uris) {
@@ -255,7 +257,8 @@ class _MyAppState extends State<MyApp> {
                     foregroundColor: Colors.black, // Text color
                     backgroundColor: Colors.yellow, // Button background color
                   ),
-                  icon: const Icon(Icons.file_present, color: Colors.black), // Add the icon
+                  icon: const Icon(Icons.file_present,
+                      color: Colors.black), // Add the icon
                   label: const Text("Pick file"), // Add the label
                 ),
                 const Divider(height: 20, thickness: 2),
@@ -271,17 +274,17 @@ class _MyAppState extends State<MyApp> {
                   padding: const EdgeInsets.all(16.0),
                   child: fileUris.isNotEmpty
                       ? Column(
-                    children: List.generate(fileUris.length, (index) {
-                      return ListTile(
-                        title: Text('Index $index: ${fileUris[index]}'),
-                      );
-                    }),
-                  )
+                          children: List.generate(fileUris.length, (index) {
+                            return ListTile(
+                              title: Text('Index $index: ${fileUris[index]}'),
+                            );
+                          }),
+                        )
                       : const Text(
-                    "No files picked yet.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16),
-                  ),
+                          "No files picked yet.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),

@@ -43,7 +43,7 @@ Watch these demo GIFs to see the plugin in action on various Android versions:
 
 | Android 9 | Android 12 | Android 14 |
 |-----------|------------|------------|
-| ![Android 9 Demo](https://ik.imagekit.io/puy8cmyj2/android_9_rec.gif?tr=h-500&updatedAt=1736167231380) | ![Android 12 Demo](https://ik.imagekit.io/puy8cmyj2/android_12_rec.gif?tr=h-500&updatedAt=1736167231129) | ![Android 14 Demo](https://ik.imagekit.io/puy8cmyj2/android_14_rec.gif?tr=h-500&updatedAt=1736167231785) |
+| ![Android 9 Demo](https://ik.imagekit.io/puy8cmyj2/android_9_flutter_media_store.gif?tr=h-500&updatedAt=1736313649782) | ![Android 12 Demo](https://ik.imagekit.io/puy8cmyj2/android_12_flutter_media_store.gif?tr=h-500&updatedAt=1736313418643) | ![Android 14 Demo](https://ik.imagekit.io/puy8cmyj2/android_14_flutter_media_store.gif?tr=h-500&updatedAt=1736313417458) |
 
 
 
@@ -89,7 +89,7 @@ Once the plugin is installed and permissions are configured, you can start savin
 The main methods to save a file are `saveFile` and `appendDataToFile`. Here's an example of how to use them:
 
 ```dart
-Future<void> saveFile({
+Future<void> saveAppendMethod({
   required String assetPath,
   required String mimeType,
   required String fileName,
@@ -220,6 +220,19 @@ ElevatedButton(
 )
 
 ```
+
+## Why Use URIs?
+
+**URI (Uniform Resource Identifier)** is a string that identifies a resource either by location, name, or both. In Android, URIs are widely used to access and manage files stored on the device or within apps.
+
+### Benefits of Using URIs:
+- **Unified Resource Access**: URIs allow access to files across different storage mechanisms (internal, external, MediaStore, etc.) without needing absolute file paths.
+- **Scoped Storage Compliance**: Using URIs ensures compliance with Android's Scoped Storage policies, introduced in Android 10, enhancing security and privacy.
+- **Simplifies File Management**: Enables direct interaction with resources like images, videos, and documents via content providers without requiring manual file management.
+- **Cross-App Compatibility**: URIs facilitate sharing and accessing files across apps using content providers.
+
+By leveraging URIs in your application, you ensure robust and secure file handling while adhering to modern Android development standards.
+
 
 ## License
 

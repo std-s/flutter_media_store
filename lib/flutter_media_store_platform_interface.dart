@@ -45,5 +45,4 @@ abstract class FlutterMediaStorePlatformInterface extends PlatformInterface {
     required Function(List<String> uris) onFilesPicked,
     required Function(String errorMessage) onError,
   });
-
 }

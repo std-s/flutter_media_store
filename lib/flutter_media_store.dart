@@ -3,7 +3,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/foundation.dart'; // For Platform checks
 
 class FlutterMediaStore {
-
   /// Native method to get the SDK version
   Future<int> _getAndroidSdkVersionNative() async {
     try {
@@ -17,7 +16,6 @@ class FlutterMediaStore {
   }
 
   /// Save a file to the MediaStore with success and error handling.
-
 
   Future<void> saveFile({
     required List<int> fileData,
@@ -59,6 +57,7 @@ class FlutterMediaStore {
       onError('Error: ${e.toString()}');
     }
   }
+
   /// Append data to an existing file in the MediaStore
 
   Future<void> appendDataToFile({
@@ -90,6 +89,7 @@ class FlutterMediaStore {
       onError('Error: ${e.toString()}');
     }
   }
+
   /// Check and request necessary permissions
 
   Future<bool> _checkAndRequestPermissions() async {
@@ -117,11 +117,11 @@ class FlutterMediaStore {
     required Function(String errorMessage) onError,
   }) async {
     try {
-      List<String> result = await FlutterMediaStorePlatformInterface.instance.pickFile(
-          multipleSelect: multipleSelect,
-          onFilesPicked: onFilesPicked,
-          onError: onError
-      );
+      List<String> result = await FlutterMediaStorePlatformInterface.instance
+          .pickFile(
+              multipleSelect: multipleSelect,
+              onFilesPicked: onFilesPicked,
+              onError: onError);
 
       if (result.isNotEmpty) {
         onFilesPicked(result); // Success callback with the picked file URIs
@@ -136,4 +136,3 @@ class FlutterMediaStore {
     }
   }
 }
-
